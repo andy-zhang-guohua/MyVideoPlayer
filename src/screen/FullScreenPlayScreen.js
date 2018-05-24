@@ -14,6 +14,9 @@ import Video from 'react-native-video';
 import Orientation from 'react-native-orientation';
 import {isIPhoneX, isSystemIOS, screenHeight, screenWidth} from "../widgets/videoPlayer/VideoPlayer";
 
+/**
+ * 直接基于 react-native-video 的全屏播放演示，注意区分，不是基于自定义的 VideoPlayer 组件
+ */
 export default class FullScreenPlayScreen extends React.Component {
 
     static navigationOptions = {

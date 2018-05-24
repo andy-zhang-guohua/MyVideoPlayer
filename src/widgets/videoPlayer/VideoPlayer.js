@@ -615,7 +615,8 @@ export default class VideoPlayer extends React.Component {
             videoHeight: height,
             isFullScreen: isFullScreen
         }, () => {
-            console.log(this.state.isFullScreen ? "视频播放控件进入全屏状态" : "视频播放控件退出全屏状态")
+            const prefix = "VideoPlayer updateLayout : 视频播放控件";
+            console.log(prefix + (this.state.isFullScreen ? "进入全屏状态" : "退出全屏状态"))
         })
     }
 

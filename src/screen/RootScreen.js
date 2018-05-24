@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import VideoListScreen from './VideoListScreen';
 import InlinePlayScreen from './InlinePlayScreen';
 import FullScreenPlayScreen from "./FullScreenPlayScreen";
+import OverlayPlayScreen from "../widgets/videoPlayer/screens/OverlayPlayScreen";
 
 export default class RootScreen extends React.Component {
 
@@ -57,9 +58,11 @@ const Navigator = StackNavigator(
     {
         tabNavigator: {screen: tabNavigator},
         InlinePlayer: {screen: InlinePlayScreen},
-        FullScreenPlayer: {screen: FullScreenPlayScreen}
+        FullScreenPlayer: {screen: FullScreenPlayScreen},
+        OverlayPlayer: {screen: OverlayPlayScreen}
     },
     {
+        //cardStyle: { backgroundColor: 'transparent' },
         navigationOptions: {
             headerBackTitle: null,
             headerTintColor: '#ffffff',

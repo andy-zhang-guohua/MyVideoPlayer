@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, View, Text, Image, TouchableHighlight, StyleSheet} from 'react-native';
+import {FlatList, Image, StyleSheet, Text, TouchableHighlight, View} from 'react-native';
 import Orientation from "react-native-orientation";
 import {statusBarHeight} from "../widgets/videoPlayer/VideoPlayer";
 
@@ -53,7 +53,10 @@ export default class VideoListScreen extends React.Component {
 
     itemSelected(url) {
         if (this.props.navigation.state.routeName === 'Mode1') {
-            this.props.navigation.navigate('InlinePlayer', {url: url});
+            this.props.navigation.navigate('OverlayPlayer', {
+                url: url,
+                videoList: videoList
+            });
         } else {
             this.props.navigation.navigate('FullScreenPlayer', {url: url});
         }

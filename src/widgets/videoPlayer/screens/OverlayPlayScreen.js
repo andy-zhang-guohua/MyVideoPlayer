@@ -1,20 +1,20 @@
 import React from 'react';
-import {View, ScrollView, Text, Image, BackHandler, TouchableHighlight} from 'react-native';
-import VideoPlayer, {defaultVideoHeight, isSystemIOS, statusBarHeight} from "../widgets/videoPlayer/VideoPlayer";
+import {BackHandler, StyleSheet, View} from 'react-native';
+import VideoPlayer, {defaultVideoHeight, isSystemIOS, statusBarHeight} from "../VideoPlayer";
 import Orientation from "react-native-orientation";
-import {videoList, styles} from "./VideoListScreen";
 
-export default class InlinePlayScreen extends React.Component {
+/**
+ * 全屏播放组件,基于 VideoPlayer,
+ * 1. 基于 react-navigation,导航头部隐藏
+ * 2. 竖屏时，播放器位于屏幕竖直方向中央
+ * 3. 横屏时，播放器占满全屏
+ */
+export default class OverlayPlayScreen extends React.Component {
 
     static navigationOptions = ({navigation}) => {
-        const params = navigation.state.params || {};
-        if (params.fullScreenVideo) {
-            return {header: null}
-        }
 
         return {
-            //header: null,
-            headerTitle: '视频播放',
+            header: null,
         }
     };
 
@@ -24,7 +24,8 @@ export default class InlinePlayScreen extends React.Component {
         this.state = {
             isFullScreen: false,
             currentUrl: this.props.navigation.state.params.url,
-            videoHeight: defaultVideoHeight
+            videoHeight: defaultVideoHeight,
+            videoList: this.props.navigation.state.params.videoList,
         };
         BackHandler.addEventListener('hardwareBackPress', this._backButtonPress);
         Orientation.addOrientationListener(this._orientationDidChange);
@@ -45,49 +46,26 @@ export default class InlinePlayScreen extends React.Component {
                     style={[{backgroundColor: '#000'}, this.state.isFullScreen ? {height: 0} : {height: statusBarHeight}]}/>);
             videoTopHeight = this.state.isFullScreen ? 0 : statusBarHeight;
         }
+
+        const styleVideoPlayer = {left: 0};
+
         return (
             <View style={styles.container} onLayout={this._onLayout}>
                 {statusBarView}
                 <VideoPlayer
                     ref={(ref) => this.videoPlayer = ref}
-                    style={{position: 'absolute', left: 0, top: videoTopHeight}}
+                    style={styleVideoPlayer}
                     videoURL={this.state.currentUrl}
                     videoTitle={this.state.currentUrl}
                     onToggleFullScreen={this._onToggleScreen}
                     onTapBackButton={this._onClickBackButton}
-                    videoList={videoList}
-                    noBackButtonWhenInline={true}
+                    videoList={this.state.videoList}
+                    noBackButtonWhenInline={false}
                 />
-                {this._renderVideoList()}
             </View>
         )
     }
 
-    _renderVideoList() {
-        const isFullScreen = this.state.isFullScreen;
-        if (isFullScreen)
-            return null;
-
-
-        return (<ScrollView style={[styles.container, {marginTop: this.state.videoHeight}]}>
-            {
-                videoList.map((item, index) => {
-                    let isSelected = (this.state.currentUrl === item);
-                    return (
-                        <TouchableHighlight key={index} underlayColor={'#dcdcdc'} onPress={() => {
-                            this.itemSelected(item)
-                        }}>
-                            <View style={styles.itemContainer}>
-                                <Text
-                                    style={[styles.title, isSelected ? styles.title_active : null]}>视频{index + 1}</Text>
-                                <Image source={require('../image/icon_right.png')} style={styles.rightIcon}/>
-                            </View>
-                        </TouchableHighlight>
-                    )
-                })
-            }
-        </ScrollView>);
-    }
 
     /// 处理安卓物理返回键，横屏时点击返回键回到竖屏，再次点击回到上个界面
     _backButtonPress = () => {
@@ -149,3 +127,13 @@ export default class InlinePlayScreen extends React.Component {
         }
     };
 }
+
+
+export const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#0000FFaa',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+});
