@@ -75,6 +75,10 @@ export default class VideoPlayer extends React.Component {
         }
     }
 
+    componentWillUnmount() {
+        this._clearTimeUnlockOrientations();
+    }
+
     _renderVideoCoverImage() {
         const styleVideoCoverImage = {
             position: 'absolute',
@@ -493,6 +497,22 @@ export default class VideoPlayer extends React.Component {
     };
 
     /**
+     * 若干毫秒后结束屏幕转动检测的锁定
+     * @param ms
+     * @private
+     */
+    _unlockOrientationsAfterSeconds(ms) {
+        this.timerUnlockAllOrientations = setTimeout(() => {
+            Orientation.unlockAllOrientations()
+        }, ms);
+    }
+
+    _clearTimeUnlockOrientations() {
+        if (this.timerUnlockAllOrientations)
+            clearTimeout(this.timerUnlockAllOrientations);
+    }
+
+    /**
      * 如果外部没有提供屏幕切换按钮的事件处理逻辑，使用这个缺省实现
      * @param isFullScreen
      * @private
@@ -505,6 +525,8 @@ export default class VideoPlayer extends React.Component {
             console.log("VideoPlayer : 视频播放控件进入全屏");
             Orientation.lockToLandscapeRight();
         }
+
+        this._unlockOrientationsAfterSeconds(10000);
     };
 
     // 点击返回键

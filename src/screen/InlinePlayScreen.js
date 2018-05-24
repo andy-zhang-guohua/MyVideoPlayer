@@ -27,12 +27,10 @@ export default class InlinePlayScreen extends React.Component {
             videoHeight: defaultVideoHeight
         };
         BackHandler.addEventListener('hardwareBackPress', this._backButtonPress);
-        Orientation.addOrientationListener(this._orientationDidChange);
     }
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this._backButtonPress);
-        Orientation.removeOrientationListener(this._orientationDidChange);
     }
 
     render() {
@@ -53,7 +51,6 @@ export default class InlinePlayScreen extends React.Component {
                     style={{position: 'absolute', left: 0, top: videoTopHeight}}
                     videoURL={this.state.currentUrl}
                     videoTitle={this.state.currentUrl}
-                    onToggleFullScreen={this._onToggleScreen}
                     onTapBackButton={this._onClickBackButton}
                     videoList={videoList}
                     noBackButtonWhenInline={true}
@@ -106,15 +103,6 @@ export default class InlinePlayScreen extends React.Component {
         this.videoPlayer.updateVideo(url, 0, null);
     }
 
-    _onToggleScreen = (isFullScreen) => {
-        if (isFullScreen) {
-            console.log("InlinePlayScreen : 视频播放控件通知退出全屏");
-            Orientation.lockToPortrait();
-        } else {
-            console.log("InlinePlayScreen : 视频播放控件通知进入全屏");
-            Orientation.lockToLandscapeRight();
-        }
-    };
 
     _onClickBackButton = () => {
         this.props.navigation.goBack();
@@ -137,15 +125,6 @@ export default class InlinePlayScreen extends React.Component {
             });
             this.props.navigation.setParams({fullScreenVideo: false})
             this.videoPlayer.updateLayout(width, width * 9 / 16, false);
-        }
-        Orientation.unlockAllOrientations();
-    };
-
-    _orientationDidChange = (orientation) => {
-        console.log("InlinePlayScreen 发现屏幕方向变化:" + orientation);
-        if (orientation === 'PORTRAIT') {
-        } else {
-
         }
     };
 }
