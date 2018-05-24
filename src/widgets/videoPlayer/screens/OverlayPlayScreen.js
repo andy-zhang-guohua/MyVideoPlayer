@@ -4,7 +4,7 @@ import VideoPlayer, {defaultVideoHeight, isSystemIOS, statusBarHeight} from "../
 import Orientation from "react-native-orientation";
 
 /**
- * 全屏播放组件,基于 VideoPlayer,
+ * 全屏播放屏幕,基于 VideoPlayer,
  * 1. 基于 react-navigation,导航头部隐藏
  * 2. 竖屏时，播放器位于屏幕竖直方向中央
  * 3. 横屏时，播放器占满全屏

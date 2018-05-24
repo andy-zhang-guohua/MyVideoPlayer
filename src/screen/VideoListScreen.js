@@ -2,6 +2,7 @@ import React from 'react';
 import {FlatList, Image, StyleSheet, Text, TouchableHighlight, View} from 'react-native';
 import Orientation from "react-native-orientation";
 import {statusBarHeight} from "../widgets/videoPlayer/VideoPlayer";
+import OverlayVideoPlayer from "../widgets/videoPlayer/OverlayVideoPlayer";
 
 export const videoList = [
     "http://wvideo.spriteapp.cn/video/2016/0328/56f8ec01d9bfe_wpd.mp4",
@@ -21,19 +22,73 @@ export default class VideoListScreen extends React.Component {
         headerTitle: (navigation.state.routeName === 'Mode1') ? '列表模式' : '全屏模式',
     });
 
+
+    static navigationOptions = ({navigation}) => {
+        const params = navigation.state.params || {};
+        if (params.isFullScreenVideo) {
+            return {
+                header: null,// hide header
+                tabBarVisible: false, // hide tab bar
+            }
+        }
+
+        return {
+            headerTitle: (navigation.state.routeName === 'Mode1') ? '列表模式' : '全屏模式',
+        }
+    }
+
     constructor(props) {
         super(props);
+
+        this.state = {
+            currentUrl: '',
+            showOverlayVideoPlayer: false,
+        };
+
+
+        this._toggleOverlayVideoPlayer = this._toggleOverlayVideoPlayer.bind(this);
+        this._hideOverlayVideoPlayer = this._hideOverlayVideoPlayer.bind(this);
+        this._onVideoFullScreenChange = this._onVideoFullScreenChange.bind(this);
+
         Orientation.lockToPortrait();
     }
 
+
+    _toggleOverlayVideoPlayer(targetShow, url) {
+        if (targetShow) {
+            Orientation.unlockAllOrientations();
+        }
+        else {
+            Orientation.lockToPortrait();
+        }
+        this.setState({showOverlayVideoPlayer: targetShow, currentUrl: url});
+    }
+
     render() {
+        const overlayVideoPlayer = (this.state.showOverlayVideoPlayer) ? this._renderOverlayVideoPlayer() : null;
+
+        return (<View style={{flex: 1}}>
+            <FlatList data={videoList} renderItem={this._renderRow} keyExtractor={(item) => item}/>
+            {overlayVideoPlayer}
+        </View>)
+    }
+
+    _hideOverlayVideoPlayer() {
+        this._toggleOverlayVideoPlayer(false);
+    }
+
+    _renderOverlayVideoPlayer() {
         return (
-            <FlatList
-                data={videoList}
-                renderItem={this._renderRow}
-                keyExtractor={(item) => item}
-            />
-        )
+            <OverlayVideoPlayer
+                url={this.state.currentUrl}
+                onTapBackButton={this._hideOverlayVideoPlayer}
+                onFullScreenChange={this._onVideoFullScreenChange}
+            />);
+    }
+
+    _onVideoFullScreenChange(isFullScreen) {
+        this.props.navigation && this.props.navigation.setParams({isFullScreenVideo: isFullScreen});
+        this.forceUpdate();
     }
 
     _renderRow = (item) => {
@@ -53,10 +108,9 @@ export default class VideoListScreen extends React.Component {
 
     itemSelected(url) {
         if (this.props.navigation.state.routeName === 'Mode1') {
-            this.props.navigation.navigate('OverlayPlayer', {
-                url: url,
-                videoList: videoList
-            });
+            //this.props.navigation.navigate('InlinePlayer', {url});
+            //this.props.navigation.navigate('OverlayPlayer', {url, videoList});
+            this._toggleOverlayVideoPlayer(true, url);
         } else {
             this.props.navigation.navigate('FullScreenPlayer', {url: url});
         }

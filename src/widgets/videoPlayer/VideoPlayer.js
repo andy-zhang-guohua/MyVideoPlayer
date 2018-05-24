@@ -25,8 +25,9 @@ import MoreSettingView from "./components/MoreSettingView";
 export default class VideoPlayer extends React.Component {
 
     static propTypes = {
-        onToggleFullScreen: PropTypes.func,
-        onTapBackButton: PropTypes.func
+        onToggleFullScreen: PropTypes.func, // 切换全屏按钮被点击
+        onTapBackButton: PropTypes.func, // 返回按钮被点击
+        onFullScreenChange: PropTypes.func,
     };
 
     static defaultProps = {
@@ -483,8 +484,27 @@ export default class VideoPlayer extends React.Component {
 
     // 点击展开全屏或收起全屏
     _onToggleFullScreen = () => {
-        console.log("VideoPlayer 正在切换全屏播放模式:" + this.state.isFullScreen);
-        this.props.onToggleFullScreen && this.props.onToggleFullScreen(this.state.isFullScreen);
+        if (this.props.onToggleFullScreen) {
+            this.props.onToggleFullScreen(this.state.isFullScreen);
+            return;
+        }
+
+        this._onToggleScreenDefault(this.state.isFullScreen);
+    };
+
+    /**
+     * 如果外部没有提供屏幕切换按钮的事件处理逻辑，使用这个缺省实现
+     * @param isFullScreen
+     * @private
+     */
+    _onToggleScreenDefault = (isFullScreen) => {
+        if (isFullScreen) {
+            console.log("VideoPlayer : 视频播放控件退出全屏");
+            Orientation.lockToPortrait();
+        } else {
+            console.log("VideoPlayer : 视频播放控件进入全屏");
+            Orientation.lockToLandscapeRight();
+        }
     };
 
     // 点击返回键
@@ -616,7 +636,8 @@ export default class VideoPlayer extends React.Component {
             isFullScreen: isFullScreen
         }, () => {
             const prefix = "VideoPlayer updateLayout : 视频播放控件";
-            console.log(prefix + (this.state.isFullScreen ? "进入全屏状态" : "退出全屏状态"))
+            console.log(prefix + (this.state.isFullScreen ? "进入了全屏状态" : "退出了全屏状态"))
+            this.props.onFullScreenChange && this.props.onFullScreenChange(this.state.isFullScreen);
         })
     }
 
